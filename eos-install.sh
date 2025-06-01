@@ -35,9 +35,9 @@ EOF
 header_info
 echo -e "Loading..."
 APP="EOS"
-var_disk="16"
+var_disk="32"
 var_cpu="4"
-var_ram="2048"
+var_ram="4096"
 var_os="debian"
 var_version="12"
 variables
@@ -79,7 +79,7 @@ function update_script() {
   pct exec $LXC_ID -- apt-get update
   pct exec $LXC_ID -- apt-get install -y git python3 python3-pip
 
-  pct exec $LXC_ID -- git clone https://github.com/AndreS2016/EOS.git /opt/eos
+  pct exec $LXC_ID -- git clone https://github.com/Akkudoktor-EOS/EOD.git /opt/eos
 
   pct exec $LXC_ID -- bash -c "if [ -f /opt/eos/requirements.txt ]; then pip3 install -r /opt/eos/requirements.txt; fi"
 
