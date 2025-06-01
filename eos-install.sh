@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 source <(curl -s https://raw.githubusercontent.com/tteck/Proxmox/main/misc/build.func)
-function ask_user() { ... }
+
 # Copyright (c) 2021-2024 tteck
 # Author: tteck (tteckster)
 # License: MIT
@@ -115,11 +115,13 @@ EOF'
   pct exec $LXC_ID -- systemctl daemon-reload
   pct exec $LXC_ID -- systemctl enable eos.service
   pct exec $LXC_ID -- systemctl start eos.service
-
-  msg_ok "✅ ${APP} erfolgreich installiert und als Service eingerichtet"
+  exit
+  
 }
 
 ask_user
 start
 build_container
 description
+
+msg_ok "✅ ${APP} erfolgreich installiert und als Service eingerichtet"
