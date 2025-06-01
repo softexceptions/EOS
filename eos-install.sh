@@ -124,4 +124,3 @@ start
 build_container
 description
 
-msg_ok "🎉 Installation abgeschlossen!"
