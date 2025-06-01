@@ -44,6 +44,8 @@ var_version="12"
 variables
 color
 catch_errors
+# SPINNER_PID initialisieren
+SPINNER_PID=""
 
 function default_Settings() {
     CT_TYPE="l"
