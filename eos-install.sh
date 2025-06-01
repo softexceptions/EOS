@@ -109,7 +109,7 @@ User=$APP_USER
 
 [Install]
 WantedBy=multi-user.target
-EOF"
+'EOF'"
     # Systemd Service erstellen
   pct exec $LXC_ID -- systemctl daemon-reexec
   pct exec $LXC_ID -- systemctl daemon-reload
