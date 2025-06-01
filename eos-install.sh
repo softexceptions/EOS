@@ -96,20 +96,20 @@ function update_script() {
 
   # Systemd Service erstellen
   pct exec $LXC_ID -- bash -c "cat <<EOF > /etc/systemd/system/eos.service
-  [Unit]
-    Description=EOS Service
-    After=network.target
+[Unit]
+Description=EOS Service
+After=network.target
 
-  [Service]
-    Type=simple
-    ExecStart=/home/$APP_USER/eos/.venv/bin/python /home/$APP_USER/eos/main.py
-    WorkingDirectory=/home/$APP_USER/eos
-    Restart=always
-    User=$APP_USER
+[Service]
+Type=simple
+ExecStart=/home/$APP_USER/eos/.venv/bin/python /home/$APP_USER/eos/main.py
+WorkingDirectory=/home/$APP_USER/eos
+Restart=always
+User=$APP_USER
 
-  [Install]
-    WantedBy=multi-user.target
-  EOF"
+[Install]
+WantedBy=multi-user.target
+EOF"
     # Systemd Service erstellen
   pct exec $LXC_ID -- systemctl daemon-reexec
   pct exec $LXC_ID -- systemctl daemon-reload
