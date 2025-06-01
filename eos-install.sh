@@ -31,7 +31,7 @@ cat <<'EOF'
        \:::\____\                \::/____/               \::::/    /       
         \::/    /                                         \::/    /        
          \/____/                                           \/____/         
-EOF                       
+EOF
 }
 header_info
 echo -e "Loading..."
@@ -44,9 +44,6 @@ var_version="12"
 variables
 color
 catch_errors
-
-# This script is used to set up the environment for the EOS project.
-# It sets the EOS_HOME variable to the current directory and adds the bin directory to the PATH.
 
 function default_Settings() {
     CT_TYPE="l"
@@ -93,10 +90,10 @@ function update_script() {
   pct exec $LXC_ID -- sudo -u "$APP_USER" git clone https://github.com/Akkudoktor-EOS/EOS.git /home/"$APP_USER"/EOS
 
   # Python venv einrichten
-  pct exec $LXC_ID -- bash -c "cd /home/$APP_USER/eos && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt || true"
+  pct exec $LXC_ID -- bash -c "cd /home/$APP_USER/EOS && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt"
 
   # Systemd Service erstellen
-pct exec $LXC_ID -- bash -c 'cat <<EOF > /etc/systemd/system/eos.service
+  pct exec $LXC_ID -- bash -c 'cat > /etc/systemd/system/eos.service <<EOF
 [Unit]
 Description=EOS Service
 After=network.target
@@ -113,8 +110,7 @@ User='"${APP_USER}"'
 WantedBy=multi-user.target
 EOF'
 
-
-    # Systemd Service erstellen
+  # Systemd Service aktivieren
   pct exec $LXC_ID -- systemctl daemon-reexec
   pct exec $LXC_ID -- systemctl daemon-reload
   pct exec $LXC_ID -- systemctl enable eos.service
@@ -127,4 +123,3 @@ ask_user
 start
 build_container
 description
-
