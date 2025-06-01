@@ -71,45 +71,57 @@ function default_Settings() {
     echo_default
 }
 
+function ask_user() {
+  read -rp "🧑 Bitte gewünschten Benutzername angeben (wird im Container erstellt): " APP_USER
+  [[ -z "$APP_USER" ]] && { echo "❌ Benutzername darf nicht leer sein."; exit 1; }
+}
+
 function update_script() {
   header_info
   LXC_ID=$CT_ID
-  msg_info "Installing ${APP} in container ${LXC_ID}"
+  msg_info "📦 Installiere ${APP} in Container ${LXC_ID}"
 
-  pct exec $LXC_ID -- apt-get update
-  pct exec $LXC_ID -- apt-get install -y git python3 python3-pip
+  pct exec $LXC_ID -- apt update
+  pct exec $LXC_ID -- apt install -y git python3 python3-pip python3-venv sudo
 
-  pct exec $LXC_ID -- git clone https://github.com/Akkudoktor-EOS/EOD.git /opt/eos
+  # Benutzer anlegen
+  pct exec $LXC_ID -- adduser --disabled-password --gecos "" "$APP_USER"
+  pct exec $LXC_ID -- usermod -aG sudo "$APP_USER"
 
-  pct exec $LXC_ID -- bash -c "if [ -f /opt/eos/requirements.txt ]; then pip3 install -r /opt/eos/requirements.txt; fi"
+  # EOS klonen
+  pct exec $LXC_ID -- sudo -u "$APP_USER" git clone https://github.com/Akkudoktor-EOS/EOS.git /home/"$APP_USER"/EOS
 
+  # Python venv einrichten
+  pct exec $LXC_ID -- bash -c "cd /home/$APP_USER/eos && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt || true"
+
+  # Systemd Service erstellen
   pct exec $LXC_ID -- bash -c "cat <<EOF > /etc/systemd/system/eos.service
+  [Unit]
+    Description=EOS Service
+    After=network.target
 
-[Unit]
- Description=EOS Service
- After=network.target
+  [Service]
+    Type=simple
+    ExecStart=/home/$APP_USER/eos/.venv/bin/python /home/$APP_USER/eos/main.py
+    WorkingDirectory=/home/$APP_USER/eos
+    Restart=always
+    User=$APP_USER
 
-[Service]
-Type=simple
-ExecStart=/usr/bin/python3 /opt/eos/main.py
-WorkingDirectory=/opt/eos
-Restart=always
-User=root
-
-[Install]
-WantedBy=multi-user.target
-EOF"
-
+  [Install]
+    WantedBy=multi-user.target
+  EOF"
+    # Systemd Service erstellen
   pct exec $LXC_ID -- systemctl daemon-reexec
   pct exec $LXC_ID -- systemctl daemon-reload
   pct exec $LXC_ID -- systemctl enable eos.service
   pct exec $LXC_ID -- systemctl start eos.service
 
-  msg_ok "${APP} installation and systemd setup complete"
+  msg_ok "✅ ${APP} erfolgreich installiert und als Service eingerichtet"
 }
 
+ask_user
 start
 build_container
 description
 
-msg_ok "Completed Successfully!\n"
+msg_ok "🎉 Installation abgeschlossen!"
