@@ -72,8 +72,14 @@ function default_Settings() {
 }
 
 function ask_user() {
-  read -rp "🧑 Bitte gewünschten Benutzername angeben (wird im Container erstellt): " APP_USER
-  [[ -z "$APP_USER" ]] && { echo "❌ Benutzername darf nicht leer sein."; exit 1; }
+  while true; do
+    read -rp "🧑 Bitte gewünschten Benutzername angeben (wird im Container erstellt): " APP_USER
+    if [[ -z "$APP_USER" ]]; then
+      echo "❌ Fehler: Benutzername darf nicht leer sein. Bitte erneut versuchen."
+    else
+      break
+    fi
+  done
 }
 
 function update_script() {
