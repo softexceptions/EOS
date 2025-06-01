@@ -96,7 +96,7 @@ function update_script() {
   pct exec $LXC_ID -- bash -c "cd /home/$APP_USER/eos && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt || true"
 
   # Systemd Service erstellen
-pct exec $LXC_ID -- bash -c sudo tee /etc/systemd/system/eos.service > /dev/null << 'EOF' 
+pct exec $LXC_ID -- bash -c "cat <<EOF > /etc/systemd/system/eos.service
 [Unit]
 Description=EOS Service
 After=network.target
@@ -111,7 +111,7 @@ User=$APP_USER
 
 [Install]
 WantedBy=multi-user.target
-EOF
+EOF"
 
     # Systemd Service erstellen
   pct exec $LXC_ID -- systemctl daemon-reexec
