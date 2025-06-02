@@ -19,12 +19,12 @@ var_ram="4096"
 var_os="debian"
 var_version="12"
 
-#header_info "$APP"
+header_info
 variables
 color
 catch_errors
 
-function header_print() {
+function header_info() {
 clear
 cat <<'EOF'
           _____                   _______                   _____          
@@ -99,7 +99,7 @@ function ask_user() {
 }
 
 function update_script() {
-  #header_info
+  header_info
   header_print
 
   LXC_ID=$CT_ID
