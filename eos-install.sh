@@ -1,14 +1,25 @@
 #!/usr/bin/env bash
 SPINNER_PID=""
 source <(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/build.func)
-
-# Copyright (c) 2021-2024 tteck
+# Copyright (c) 2021-2025 tteck
 # Author: tteck (tteckster)
-# License: MIT
-# https://github.com/tteck/Proxmox/raw/main/LICENSE
+# License: MIT | https://github.com/community-scripts/ProxmoxVE/raw/main/LICENSE
 
 # Version: 1.0.0
-function header_info() {
+# header_info
+echo -e "⏳ Loading..."
+
+APP="EOS"
+var_disk="32"
+var_cpu="4"
+var_ram="4096"
+var_os="debian"
+var_version="12"
+variables
+color
+catch_errors
+
+function header_print() {
 clear
 cat <<'EOF'
           _____                   _______                   _____          
@@ -34,20 +45,7 @@ cat <<'EOF'
          \/____/                                           \/____/         
 EOF
 }
-header_info
-echo -e "⏳ Loading..."
 
-APP="EOS"
-var_disk="32"
-var_cpu="4"
-var_ram="4096"
-var_os="debian"
-var_version="12"
-variables
-color
-catch_errors
-# SPINNER_PID initialisieren
-SPINNER_PID=""
 
 function default_Settings() {
     CT_TYPE="l"
@@ -94,7 +92,9 @@ function ask_user() {
 }
 
 function update_script() {
-  header_info
+  #header_info
+  header_print
+
   LXC_ID=$CT_ID
   msg_info "📦 Installing ${APP} in container ${LXC_ID}"
 
