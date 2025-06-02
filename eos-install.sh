@@ -77,13 +77,15 @@ function ask_user() {
   local default_user="eosuser"
   echo "ℹ️  You will now be asked to specify a username for the container."
   echo "👉 Press [Enter] to use the default username '${default_user}'."
-  read -rep "🧑 Enter username (Default: ${default_user}): " APP_USER
+  read -p "🧑 Enter username (Default: ${default_user}): " -ei "${default_user}" APP_USER
   APP_USER=${APP_USER:-$default_user}
 
   while true; do
-    read -rsp "🔐 Enter password for user '$APP_USER': " APP_PASS
+    echo -n "🔐 Enter password for user '$APP_USER': "
+    read -rs APP_PASS
     echo
-    read -rsp "🔁 Confirm password: " APP_PASS2
+    echo -n "🔁 Confirm password: "
+    read -rs APP_PASS2
     echo
     if [[ "$APP_PASS" != "$APP_PASS2" ]]; then
       echo "❌ Passwords do not match. Please try again."
