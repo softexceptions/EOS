@@ -34,7 +34,8 @@ cat <<'EOF'
 EOF
 }
 header_info
-echo -e "Loading..."
+echo -e "⏳ Loading..."
+
 APP="EOS"
 var_disk="32"
 var_cpu="4"
@@ -72,10 +73,19 @@ function default_Settings() {
 }
 
 function ask_user() {
+  local default_user="eosuser"
+  echo "ℹ️  You will now be asked to specify a username for the container."
+  echo "👉 Press [Enter] to use the default username '${default_user}'."
+  read -rep "🧑 Enter username (Default: ${default_user}): " APP_USER
+  APP_USER=${APP_USER:-$default_user}
+
   while true; do
-    read -rp "🧑 Bitte gewünschten Benutzername angeben (wird im Container erstellt): " APP_USER
-    if [[ -z "$APP_USER" ]]; then
-      echo "❌ Fehler: Benutzername darf nicht leer sein. Bitte erneut versuchen."
+    read -rsp "🔐 Enter password for user '$APP_USER': " APP_PASS
+    echo
+    read -rsp "🔁 Confirm password: " APP_PASS2
+    echo
+    if [[ "$APP_PASS" != "$APP_PASS2" ]]; then
+      echo "❌ Passwords do not match. Please try again."
     else
       break
     fi
@@ -85,14 +95,13 @@ function ask_user() {
 function update_script() {
   header_info
   LXC_ID=$CT_ID
-  msg_info "📦 Installiere ${APP} in Container ${LXC_ID}"
+  msg_info "📦 Installing ${APP} in container ${LXC_ID}"
 
   pct exec $LXC_ID -- apt update
   pct exec $LXC_ID -- apt install -y git python3 python3-pip python3-venv sudo
 
-  # Benutzer anlegen
-  pct exec $LXC_ID -- adduser --disabled-password --gecos "" "$APP_USER"
-  pct exec $LXC_ID -- usermod -aG sudo "$APP_USER"
+  # Benutzer mit Passwort anlegen und sudo-Rechte geben
+  pct exec $LXC_ID -- bash -c "useradd -m -s /bin/bash $APP_USER && echo '$APP_USER:$APP_PASS' | chpasswd && usermod -aG sudo $APP_USER"
 
   # EOS klonen
   pct exec $LXC_ID -- sudo -u "$APP_USER" git clone https://github.com/Akkudoktor-EOS/EOS.git /home/"$APP_USER"/EOS
@@ -132,4 +141,4 @@ start
 build_container
 description
 
-msg_ok "✅ ${APP} erfolgreich installiert und als Service eingerichtet"
+msg_ok "✅ ${APP} successfully installed and configured as a service"
